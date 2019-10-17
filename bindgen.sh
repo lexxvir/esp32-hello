@@ -9,7 +9,6 @@ SYSROOT=$HOME/xtensa-esp32-elf/xtensa-esp32-elf/sysroot
 TARGET=xtensa-none-elf
 
 BINDGEN=bindgen
-LIBCLANG_PATH=$HOME/git/rust/xtensa/llvm_build/lib
 CLANG_FLAGS="\
 	--sysroot=$SYSROOT \
     -I$(pwd)/build/include \
