@@ -6786,6 +6786,15 @@ pub const GPIO_MODE_DEF_DISABLE: u32 = 0;
 pub const GPIO_MODE_DEF_INPUT: u32 = 1;
 pub const GPIO_MODE_DEF_OUTPUT: u32 = 2;
 pub const GPIO_MODE_DEF_OD: u32 = 4;
+pub const LOG_LOCAL_LEVEL: u32 = 3;
+pub const LOG_COLOR_BLACK: &'static [u8; 3usize] = b"30\0";
+pub const LOG_COLOR_RED: &'static [u8; 3usize] = b"31\0";
+pub const LOG_COLOR_GREEN: &'static [u8; 3usize] = b"32\0";
+pub const LOG_COLOR_BROWN: &'static [u8; 3usize] = b"33\0";
+pub const LOG_COLOR_BLUE: &'static [u8; 3usize] = b"34\0";
+pub const LOG_COLOR_PURPLE: &'static [u8; 3usize] = b"35\0";
+pub const LOG_COLOR_CYAN: &'static [u8; 3usize] = b"36\0";
+pub const LOG_RESET_COLOR: &'static [u8; 5usize] = b"\x1B[0m\0";
 pub type __int8_t = ::std::os::raw::c_schar;
 pub type __uint8_t = ::std::os::raw::c_uchar;
 pub type __int16_t = ::std::os::raw::c_short;
@@ -21561,6 +21570,118 @@ extern "C" {
     #[doc = "        One of the ``FUNC_X_*`` of specified pin (X) in ``soc/io_mux_reg.h``."]
     #[doc = " @param oen_inv True if the output enable needs to be inversed, otherwise False."]
     pub fn gpio_iomux_out(gpio_num: u8, func: ::std::os::raw::c_int, oen_inv: bool);
+}
+#[doc = "< No log output"]
+pub const esp_log_level_t_ESP_LOG_NONE: esp_log_level_t = 0;
+#[doc = "< Critical errors, software module can not recover on its own"]
+pub const esp_log_level_t_ESP_LOG_ERROR: esp_log_level_t = 1;
+#[doc = "< Error conditions from which recovery measures have been taken"]
+pub const esp_log_level_t_ESP_LOG_WARN: esp_log_level_t = 2;
+#[doc = "< Information messages which describe normal flow of events"]
+pub const esp_log_level_t_ESP_LOG_INFO: esp_log_level_t = 3;
+#[doc = "< Extra information which is not necessary for normal use (values, pointers, sizes, etc)."]
+pub const esp_log_level_t_ESP_LOG_DEBUG: esp_log_level_t = 4;
+#[doc = "< Bigger chunks of debugging information, or frequent messages which can potentially flood the output."]
+pub const esp_log_level_t_ESP_LOG_VERBOSE: esp_log_level_t = 5;
+#[doc = " @brief Log level"]
+#[doc = ""]
+pub type esp_log_level_t = u32;
+pub type vprintf_like_t = ::core::option::Option<
+    unsafe extern "C" fn(
+        arg1: *const ::std::os::raw::c_char,
+        arg2: va_list,
+    ) -> ::std::os::raw::c_int,
+>;
+extern "C" {
+    #[doc = " @brief Set log level for given tag"]
+    #[doc = ""]
+    #[doc = " If logging for given component has already been enabled, changes previous setting."]
+    #[doc = ""]
+    #[doc = " Note that this function can not raise log level above the level set using"]
+    #[doc = " CONFIG_LOG_DEFAULT_LEVEL setting in menuconfig."]
+    #[doc = ""]
+    #[doc = " To raise log level above the default one for a given file, define"]
+    #[doc = " LOG_LOCAL_LEVEL to one of the ESP_LOG_* values, before including"]
+    #[doc = " esp_log.h in this file."]
+    #[doc = ""]
+    #[doc = " @param tag Tag of the log entries to enable. Must be a non-NULL zero terminated string."]
+    #[doc = "            Value \"*\" resets log level for all tags to the given value."]
+    #[doc = ""]
+    #[doc = " @param level  Selects log level to enable. Only logs at this and lower verbosity"]
+    #[doc = " levels will be shown."]
+    pub fn esp_log_level_set(tag: *const ::std::os::raw::c_char, level: esp_log_level_t);
+}
+extern "C" {
+    #[doc = " @brief Set function used to output log entries"]
+    #[doc = ""]
+    #[doc = " By default, log output goes to UART0. This function can be used to redirect log"]
+    #[doc = " output to some other destination, such as file or network. Returns the original"]
+    #[doc = " log handler, which may be necessary to return output to the previous destination."]
+    #[doc = ""]
+    #[doc = " @param func new Function used for output. Must have same signature as vprintf."]
+    #[doc = ""]
+    #[doc = " @return func old Function used for output."]
+    pub fn esp_log_set_vprintf(func: vprintf_like_t) -> vprintf_like_t;
+}
+extern "C" {
+    #[doc = " @brief Function which returns timestamp to be used in log output"]
+    #[doc = ""]
+    #[doc = " This function is used in expansion of ESP_LOGx macros."]
+    #[doc = " In the 2nd stage bootloader, and at early application startup stage"]
+    #[doc = " this function uses CPU cycle counter as time source. Later when"]
+    #[doc = " FreeRTOS scheduler start running, it switches to FreeRTOS tick count."]
+    #[doc = ""]
+    #[doc = " For now, we ignore millisecond counter overflow."]
+    #[doc = ""]
+    #[doc = " @return timestamp, in milliseconds"]
+    pub fn esp_log_timestamp() -> u32;
+}
+extern "C" {
+    #[doc = " @brief Function which returns timestamp to be used in log output"]
+    #[doc = ""]
+    #[doc = " This function uses HW cycle counter and does not depend on OS,"]
+    #[doc = " so it can be safely used after application crash."]
+    #[doc = ""]
+    #[doc = " @return timestamp, in milliseconds"]
+    pub fn esp_log_early_timestamp() -> u32;
+}
+extern "C" {
+    #[doc = " @brief Write message into the log"]
+    #[doc = ""]
+    #[doc = " This function is not intended to be used directly. Instead, use one of"]
+    #[doc = " ESP_LOGE, ESP_LOGW, ESP_LOGI, ESP_LOGD, ESP_LOGV macros."]
+    #[doc = ""]
+    #[doc = " This function or these macros should not be used from an interrupt."]
+    pub fn esp_log_write(
+        level: esp_log_level_t,
+        tag: *const ::std::os::raw::c_char,
+        format: *const ::std::os::raw::c_char,
+        ...
+    );
+}
+extern "C" {
+    pub fn esp_log_buffer_hex_internal(
+        tag: *const ::std::os::raw::c_char,
+        buffer: *const ::std::os::raw::c_void,
+        buff_len: u16,
+        level: esp_log_level_t,
+    );
+}
+extern "C" {
+    pub fn esp_log_buffer_char_internal(
+        tag: *const ::std::os::raw::c_char,
+        buffer: *const ::std::os::raw::c_void,
+        buff_len: u16,
+        level: esp_log_level_t,
+    );
+}
+extern "C" {
+    pub fn esp_log_buffer_hexdump_internal(
+        tag: *const ::std::os::raw::c_char,
+        buffer: *const ::std::os::raw::c_void,
+        buff_len: u16,
+        log_level: esp_log_level_t,
+    );
 }
 pub type __builtin_va_list = __va_list_tag;
 #[repr(C)]
