@@ -3,10 +3,9 @@
 source setenv.sh
 
 # export V=1
-make -j6 app
-
-cargo build --release #--verbose
-
+make -j6 app && \
+# cargo build --release #--verbose && \
+cargo build --release && \
 $IDF_PATH/components/esptool_py/esptool/esptool.py \
 	--chip esp32 \
 	elf2image \
