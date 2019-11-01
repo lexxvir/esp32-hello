@@ -54,8 +54,7 @@ unsafe fn rust_blink_and_write() {
         /* Blink off (output low) */
         gpio_set_level(BLINK_GPIO, 0);
 
-        //vTaskDelay(1000 / portTICK_PERIOD_MS);
-        ets_delay_us(1_000_000);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
 
         // Write data to UART.
         let test_str = "This is a test string.\n";
@@ -72,7 +71,6 @@ unsafe fn rust_blink_and_write() {
         /* Blink on (output high) */
         gpio_set_level(BLINK_GPIO, 1);
 
-        // vTaskDelay(1000 / portTICK_PERIOD_MS);
-        ets_delay_us(1_000_000);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
