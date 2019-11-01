@@ -6779,6 +6779,7 @@ pub const LOG_COLOR_BLUE: &'static [u8; 3usize] = b"34\0";
 pub const LOG_COLOR_PURPLE: &'static [u8; 3usize] = b"35\0";
 pub const LOG_COLOR_CYAN: &'static [u8; 3usize] = b"36\0";
 pub const LOG_RESET_COLOR: &'static [u8; 5usize] = b"\x1B[0m\0";
+pub const portTICK_PERIOD_MS: u32 = 10;
 pub type __int8_t = ::std::os::raw::c_schar;
 pub type __uint8_t = ::std::os::raw::c_uchar;
 pub type __int16_t = ::std::os::raw::c_short;
