@@ -2,14 +2,12 @@
 
 set -e
 
-source setenv.sh
+source ../setenv.sh
 
 COMPS=$IDF_PATH/components
 SYSROOT=$HOME/xtensa-esp32-elf/xtensa-esp32-elf/sysroot
-TARGET=xtensa-none-elf
 
 BINDGEN=bindgen
-LIBCLANG_PATH=$HOME/git/rust/xtensa/llvm_build/lib
 CLANG_FLAGS="\
 	--sysroot=$SYSROOT \
     -I$(pwd)/build/include \
@@ -25,6 +23,8 @@ for INC in `ls -d $COMPS/*/include`; do
 	#echo $INC
 	CLANG_FLAGS+=" -I$INC"
 done
+
+CLANG_FLAGS+=" -I../build/include"
 
 #echo $CLANG_FLAGS
 

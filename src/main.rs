@@ -54,17 +54,23 @@ unsafe fn rust_blink_and_write() {
         /* Blink off (output low) */
         gpio_set_level(BLINK_GPIO, 0);
 
-        //vTaskDelay(1000 / portTICK_PERIOD_MS);
-        ets_delay_us(1_000_000);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
 
         // Write data to UART.
         let test_str = "This is a test string.\n";
-        uart_write_bytes(UART_NUM, test_str.as_ptr() as *const _, test_str.len());
+        // uart_write_bytes(UART_NUM, test_str.as_ptr() as *const _, test_str.len());
+        let tag = "Rust\0";
+
+        esp_log_write(esp_log_level_t_ESP_LOG_INFO,
+                      tag.as_ptr() as *const _,
+                      " (%d) %s: %s\n\0".as_ptr() as *const _,
+                      esp_log_timestamp(),
+                      tag.as_ptr() as *const _,
+                      "I, live, again!.\0".as_ptr() as *const _);
 
         /* Blink on (output high) */
         gpio_set_level(BLINK_GPIO, 1);
 
-        // vTaskDelay(1000 / portTICK_PERIOD_MS);
-        ets_delay_us(1_000_000);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
